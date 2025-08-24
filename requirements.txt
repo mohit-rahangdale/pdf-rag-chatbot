@@ -1,8 +1,8 @@
-streamlit
+gradio
 PyPDF2
 langchain
 langchain-google-genai
 langchain-community
 faiss-cpu
-python-dotenv
 google-generativeai
+python-dotenv
