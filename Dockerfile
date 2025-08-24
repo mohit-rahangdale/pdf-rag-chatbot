@@ -1,5 +1,5 @@
-# Use Python 3.10 
-FROM python:3.10-slim
+# Use Python 3.13
+FROM python:3.13-slim
 
 # Set working directory inside container
 WORKDIR /app
