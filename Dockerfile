@@ -1,20 +1,21 @@
-# use the official Python base image
-FROM python:3.9-slim
+# Use Python 3.10 
+FROM python:3.10-slim
 
-# set the working directory inside the container
+# Set working directory inside container
 WORKDIR /app
 
-# copy your requirements file
-COPY requirements.txt ./requirements.txt
+# Copy requirements file first (better for caching layers)
+COPY requirements.txt .
 
-# Install all the necessary libraries
-RUN pip install --no-cache-dir -r requirements.txt
+# Install dependencies
+RUN pip install --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of your app's code
+# Copy the rest of the application code
 COPY . .
 
-# expose the port Gradio runs on (default is 7860)
+# Expose Gradio default port
 EXPOSE 7860
 
-# The command to start your Gradio app
+# Start the app
 CMD ["python", "app.py"]
