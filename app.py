@@ -19,7 +19,7 @@ def get_pdf_text(pdf_files):
     """Reads and extracts all text from a list of PDF files."""
     text = ""
     for pdf in pdf_files:
-        pdf_reader = PdfReader(pdf.name) 
+        pdf_reader = PdfReader(pdf) 
         for page in pdf_reader.pages:
             text += page.extract_text()
     return text
@@ -34,7 +34,7 @@ def get_text_chunks(text):
 def process_documents(files):
     """The main processing pipeline. Triggered by the 'Process' button."""
     if not files or len(files) != 2:
-        return None, gr.update(value=" Please upload two PDF files.", visible=True)
+        return None, gr.update(value="Please upload two PDF files.", visible=True)
     
     try:
         # The whole RAG process in one go
@@ -43,22 +43,23 @@ def process_documents(files):
         embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
         vector_store = FAISS.from_texts(text_chunks, embedding=embeddings)
         
-        # A quick success message for the user
-        gr.Info("Documents processed successfully! You can now ask questions.")
-        return vector_store, gr.update(value="", visible=False)
+        # Success message shown in status box
+        return vector_store, gr.update(value="Documents processed successfully! You can now ask questions.", visible=True)
     except Exception as e:
-        print(e) # For debugging in the logs
+        print(e)  # For debugging in the logs
         return None, gr.update(value=f"An error occurred: {e}", visible=True)
+
 
 def user_interaction(user_input, chat_history, vector_store):
     """Handles the chat logic for each user message."""
-    # Dont do anything if the user hasn't processed documents yet
     if vector_store is None:
-        gr.Warning("Please process your documents first.")
+        # Show warning inside chat history itself
+        chat_history.append((user_input, "Please process your documents first."))
         return "", chat_history
     
     # Find relevant documents and run the QA chain
     docs = vector_store.similarity_search(user_input)
+    
     
     prompt_template = """
     Answer the question as detailed as possible from the provided context.
